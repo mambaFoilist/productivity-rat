@@ -32,6 +32,8 @@ function createWindow() {
 
 ipcMain.handle('get-tasks', () => store.get('tasks', []))
 ipcMain.handle('set-tasks', (_, tasks) => store.set('tasks', tasks))
+ipcMain.handle('get-board', () => store.get('board', null))
+ipcMain.handle('set-board', (_, snapshot) => store.set('board', snapshot))
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')

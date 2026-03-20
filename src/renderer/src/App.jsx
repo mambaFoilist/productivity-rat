@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import CalendarView from './components/CalendarView'
+import Blackboard from './components/Blackboard'
 
 const PRIORITIES = ['Today', 'This Week', 'This Month', 'Someday']
 
@@ -9,25 +11,65 @@ const PRIORITY_COLORS = {
   Someday: '#9b59b6'
 }
 
-function App() {
-  const [tasks, setTasks] = useState([])
+const sidebarStyle = {
+  width: '200px',
+  minHeight: '100vh',
+  backgroundColor: '#12122a',
+  padding: '32px 16px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '8px',
+  flexShrink: 0
+}
+
+const navBtnBase = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  padding: '10px 14px',
+  borderRadius: '8px',
+  border: 'none',
+  fontSize: '15px',
+  cursor: 'pointer',
+  fontFamily: 'sans-serif',
+  width: '100%',
+  textAlign: 'left'
+}
+
+function Sidebar({ page, setPage }) {
+  const items = [
+    { id: 'tasks', label: 'Tasks', icon: '✅' },
+    { id: 'calendar', label: 'Calendar', icon: '🗓' },
+    { id: 'blackboard', label: 'Blackboard', icon: '🖊' }
+  ]
+  return (
+    <div style={sidebarStyle}>
+      <div style={{ color: 'white', fontFamily: 'sans-serif', fontWeight: 700, fontSize: '18px', marginBottom: '16px', paddingLeft: '4px' }}>
+        🐀 ProdRat
+      </div>
+      {items.map(item => (
+        <button
+          key={item.id}
+          onClick={() => setPage(item.id)}
+          style={{
+            ...navBtnBase,
+            backgroundColor: page === item.id ? '#e94560' : 'transparent',
+            color: page === item.id ? 'white' : 'rgba(255,255,255,0.6)'
+          }}
+        >
+          <span>{item.icon}</span>
+          <span>{item.label}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function TasksView({ tasks, setTasks }) {
   const [input, setInput] = useState('')
   const [dueDate, setDueDate] = useState('')
   const [priority, setPriority] = useState('Someday')
   const [filter, setFilter] = useState('All')
-  const loaded = useRef(false)
-
-  useEffect(() => {
-    window.api.getTasks().then(saved => {
-      setTasks(saved)
-      loaded.current = true
-    })
-  }, [])
-
-  useEffect(() => {
-    if (!loaded.current) return
-    window.api.setTasks(tasks)
-  }, [tasks])
 
   function addTask() {
     if (input.trim() === '') return
@@ -52,8 +94,8 @@ function App() {
   })
 
   return (
-    <div style={{ backgroundColor: '#1a1a2e', minHeight: '100vh', padding: '40px', color: 'white', fontFamily: 'sans-serif' }}>
-      <h1>🐀 ProductivityRat</h1>
+    <div style={{ flex: 1, padding: '40px', overflow: 'auto', color: 'white', fontFamily: 'sans-serif' }}>
+      <h1 style={{ marginBottom: '24px' }}>✅ Tasks</h1>
 
       <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
         <input
@@ -127,4 +169,29 @@ function App() {
   )
 }
 
-export default App
+export default function App() {
+  const [tasks, setTasks] = useState([])
+  const [page, setPage] = useState('tasks')
+  const loaded = useRef(false)
+
+  useEffect(() => {
+    window.api.getTasks().then(saved => {
+      setTasks(saved)
+      loaded.current = true
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!loaded.current) return
+    window.api.setTasks(tasks)
+  }, [tasks])
+
+  return (
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#1a1a2e' }}>
+      <Sidebar page={page} setPage={setPage} />
+      {page === 'tasks' && <TasksView tasks={tasks} setTasks={setTasks} />}
+      {page === 'calendar' && <CalendarView tasks={tasks} />}
+      {page === 'blackboard' && <Blackboard />}
+    </div>
+  )
+}

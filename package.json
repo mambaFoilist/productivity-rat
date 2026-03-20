@@ -20,7 +20,13 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "electron-store": "^8.2.0"
+    "@fullcalendar/core": "^6.1.20",
+    "@fullcalendar/daygrid": "^6.1.20",
+    "@fullcalendar/interaction": "^6.1.20",
+    "@fullcalendar/react": "^6.1.20",
+    "@tldraw/tldraw": "^4.5.3",
+    "electron-store": "^8.2.0",
+    "tldraw": "^4.5.3"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
