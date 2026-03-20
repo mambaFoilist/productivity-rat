@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import Store from 'electron-store'
+import Anthropic from '@anthropic-ai/sdk'
 
 const store = new Store()
 
@@ -34,6 +35,43 @@ ipcMain.handle('get-tasks', () => store.get('tasks', []))
 ipcMain.handle('set-tasks', (_, tasks) => store.set('tasks', tasks))
 ipcMain.handle('get-board', () => store.get('board', null))
 ipcMain.handle('set-board', (_, snapshot) => store.set('board', snapshot))
+ipcMain.handle('get-api-key', () => store.get('apiKey', ''))
+ipcMain.handle('set-api-key', (_, key) => store.set('apiKey', key))
+
+ipcMain.handle('chat-send', async (event, { messages, tasks }) => {
+  const apiKey = store.get('apiKey', '')
+  if (!apiKey) throw new Error('No API key set. Add one in Settings.')
+
+  const client = new Anthropic({ apiKey })
+
+  const taskList = tasks.length
+    ? tasks.map(t => `- [${t.done ? 'x' : ' '}] ${t.title} (${t.priority}${t.dueDate ? ', due: ' + t.dueDate : ''})`).join('\n')
+    : 'No tasks yet.'
+
+  const systemPrompt = `You are a helpful productivity assistant built into ProductivityRat, a personal task manager. Be concise and practical.
+
+The user's current tasks:
+${taskList}`
+
+  const stream = client.messages.stream({
+    model: 'claude-opus-4-6',
+    max_tokens: 16000,
+    thinking: { type: 'adaptive' },
+    system: systemPrompt,
+    messages
+  })
+
+  stream.on('text', (text) => {
+    event.sender.send('chat-chunk', text)
+  })
+
+  stream.on('error', (err) => {
+    event.sender.send('chat-error', err.message)
+  })
+
+  await stream.finalMessage()
+  event.sender.send('chat-done')
+})
 
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.electron')

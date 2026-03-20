@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import CalendarView from './components/CalendarView'
 import Blackboard from './components/Blackboard'
+import ChatView from './components/ChatView'
+import SettingsView from './components/SettingsView'
 
 const PRIORITIES = ['Today', 'This Week', 'This Month', 'Someday']
 
@@ -40,7 +42,9 @@ function Sidebar({ page, setPage }) {
   const items = [
     { id: 'tasks', label: 'Tasks', icon: '✅' },
     { id: 'calendar', label: 'Calendar', icon: '🗓' },
-    { id: 'blackboard', label: 'Blackboard', icon: '🖊' }
+    { id: 'blackboard', label: 'Blackboard', icon: '🖊' },
+    { id: 'chat', label: 'AI Chat', icon: '💬' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' }
   ]
   return (
     <div style={sidebarStyle}>
@@ -192,6 +196,8 @@ export default function App() {
       {page === 'tasks' && <TasksView tasks={tasks} setTasks={setTasks} />}
       {page === 'calendar' && <CalendarView tasks={tasks} />}
       {page === 'blackboard' && <Blackboard />}
+      {page === 'chat' && <ChatView tasks={tasks} />}
+      {page === 'settings' && <SettingsView />}
     </div>
   )
 }
