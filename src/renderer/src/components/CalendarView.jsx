@@ -2,10 +2,10 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 
 const PRIORITY_COLORS = {
-  Today: '#e94560',
-  'This Week': '#f5a623',
-  'This Month': '#7ed321',
-  Someday: '#9b59b6'
+  Today:        '#C94B4B',
+  'This Week':  '#C4873A',
+  'This Month': '#5E8A3A',
+  Someday:      '#7B68EE'
 }
 
 export default function CalendarView({ tasks }) {
@@ -16,15 +16,15 @@ export default function CalendarView({ tasks }) {
       title: t.title,
       date: t.dueDate,
       backgroundColor: PRIORITY_COLORS[t.priority] || '#555',
-      borderColor: PRIORITY_COLORS[t.priority] || '#555',
+      borderColor: 'transparent',
       textColor: '#fff',
       classNames: t.done ? ['fc-event-done'] : []
     }))
 
   return (
-    <div style={{ padding: '40px', flex: 1, overflow: 'auto' }}>
-      <h1 style={{ color: 'white', fontFamily: 'sans-serif', marginBottom: '24px' }}>🗓 Calendar</h1>
-      <div style={{ backgroundColor: '#16213e', borderRadius: '12px', padding: '20px' }}>
+    <div style={{ flex: 1, padding: '40px', overflow: 'auto', backgroundColor: '#1C1C1E', fontFamily: 'sans-serif' }}>
+      <h1 style={{ margin: '0 0 28px', fontSize: '22px', fontWeight: 600, color: '#F5F0E8' }}>Calendar</h1>
+      <div style={{ backgroundColor: '#2C2C2E', borderRadius: '12px', padding: '24px', border: '1px solid rgba(245,240,232,0.07)' }}>
         <FullCalendar
           plugins={[dayGridPlugin]}
           initialView="dayGridMonth"
